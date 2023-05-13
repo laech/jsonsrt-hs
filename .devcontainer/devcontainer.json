@@ -1,0 +1,16 @@
+{
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/haskell:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "haskell.haskell",
+        "redhat.vscode-yaml"
+      ]
+    }
+  }
+}
