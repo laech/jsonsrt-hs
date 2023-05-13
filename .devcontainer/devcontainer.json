@@ -3,7 +3,9 @@
     "dockerfile": "Dockerfile"
   },
   "features": {
-    "ghcr.io/devcontainers-contrib/features/haskell:2": {}
+    "ghcr.io/devcontainers-contrib/features/haskell:2": {
+      "ghcVersion": "9.2.7"
+    }
   },
   "customizations": {
     "vscode": {
