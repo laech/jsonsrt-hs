@@ -14,5 +14,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: apt-get install -y libgmp-dev libtinfo-dev
+      - run: sudo apt-get install -y libgmp-dev libtinfo-dev
 #      - run: stack install --test
