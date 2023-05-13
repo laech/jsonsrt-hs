@@ -20,3 +20,7 @@ jobs:
           enable-stack: true
           stack-version: "latest"
       - run: stack install --test
+      - uses: actions/upload-artifact@v3
+        with:
+          name: json-sort
+          path: ~/.local/bin/json-sort-exe
