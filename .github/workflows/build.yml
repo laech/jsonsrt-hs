@@ -19,8 +19,14 @@ jobs:
           ghc-version: 9.2.7
           enable-stack: true
           stack-version: "latest"
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.stack
+          key: ${{ runner.os }}-${{ runner.arch }}-build
+
       - run: stack install --test
       - uses: actions/upload-artifact@v3
         with:
-          name: json-sort-{{ runner.os }}-{{ runner.arch }}
+          name: json-sort-${{ runner.os }}-${{ runner.arch }}
           path: ~/.local/bin/json-sort-exe
