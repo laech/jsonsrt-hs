@@ -15,5 +15,5 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt-get install -y libgmp-dev libtinfo-dev
-      - run: sudo curl -sSL https://get.haskellstack.org/ | sh
-#      - run: stack install --test
+      - run: sudo curl -sSL https://get.haskellstack.org/ | sh -s - -f
+      - run: stack install --test
