@@ -22,5 +22,5 @@ jobs:
       - run: stack install --test
       - uses: actions/upload-artifact@v3
         with:
-          name: json-sort
+          name: json-sort-{{ runner.os }}-{{ runner.arch }}
           path: ~/.local/bin/json-sort-exe
