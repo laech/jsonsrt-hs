@@ -1,0 +1,62 @@
+cabal-version: 2.4
+name: json-sort
+version: 0.1.0.0
+
+library lib
+  exposed-modules:
+    Data.Jsonish
+    Data.Jsonish.Format
+  other-modules:
+    Paths_json_sort
+  hs-source-dirs:
+    src
+  default-extensions:
+    ImportQualifiedPost
+    OverloadedStrings
+  build-depends:
+    base,
+    binary,
+    bytestring,
+    megaparsec,
+    text,
+  default-language: Haskell2010
+
+executable json-sort
+  main-is: Main.hs
+  other-modules:
+    Paths_json_sort
+  hs-source-dirs:
+    app
+  default-extensions:
+    ImportQualifiedPost
+    OverloadedStrings
+  build-depends:
+    lib,
+    base,
+    binary,
+    bytestring,
+    megaparsec,
+    text,
+  default-language: Haskell2010
+
+test-suite json-sort-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+    Data.JsonishSpec
+    Paths_json_sort
+  hs-source-dirs:
+    test
+  default-extensions:
+    ImportQualifiedPost
+    OverloadedStrings
+  build-depends:
+    lib,
+    base,
+    binary,
+    bytestring,
+    hspec,
+    megaparsec,
+    string-interpolate,
+    text,
+  default-language: Haskell2010

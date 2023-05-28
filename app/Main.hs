@@ -1,7 +1,10 @@
 module Main (main) where
 
+import Data.ByteString.Lazy qualified as LBS
 import Data.Jsonish qualified as Jsonish
-import Data.Text.IO qualified as Text
+import Data.Jsonish.Format qualified as Jsonish
 
 main :: IO ()
-main = Text.getContents >>= either print Text.putStrLn . Jsonish.format
+main =
+  LBS.getContents
+    >>= either print (LBS.putStr . Jsonish.format) . Jsonish.parse
