@@ -1,15 +1,15 @@
 module Data.Jsonish.Format (format) where
 
-import Data.ByteString.Lazy (LazyByteString)
-import Data.ByteString.Lazy qualified as LBS
 import Data.Jsonish (Jsonish (Array, Object, Value))
+import Data.Text.Lazy (Text)
+import Data.Text.Lazy qualified as Text
 
-format :: Jsonish -> LazyByteString
+format :: Jsonish -> Text
 format = fmtJsonish 0 False
   where
     fmtJsonish level indentFirstLine val =
       (if indentFirstLine then indent level else "") <> case val of
-        (Value x) -> LBS.fromStrict x
+        (Value x) -> x
         (Array []) -> "[]"
         (Array xs) -> "[\n" <> fmtArr level xs <> "\n" <> indent level <> "]"
         (Object []) -> "{}"
@@ -19,9 +19,9 @@ format = fmtJsonish 0 False
     fmtObj level = foldLine . fmap (fmtMember level)
     fmtMember level (key, val) =
       indent (level + 1)
-        <> LBS.fromStrict key
+        <> key
         <> ": "
         <> fmtJsonish (level + 1) False val
 
-    foldLine = LBS.intercalate ",\n"
-    indent level = LBS.take (level * 2) $ LBS.cycle " "
+    foldLine = Text.intercalate ",\n"
+    indent level = Text.replicate level "  "

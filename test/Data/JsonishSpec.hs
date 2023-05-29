@@ -5,16 +5,15 @@
 module Data.JsonishSpec (spec) where
 
 import Control.Monad (forM_)
-import Data.ByteString.Lazy (LazyByteString)
 import Data.Jsonish (Jsonish (..), parse)
 import Data.Jsonish.Format (format)
 import Data.String.Interpolate (i)
+import Data.Text.Lazy (Text)
 import Data.Text.Lazy qualified as Text
-import Data.Text.Lazy.Encoding qualified as Text
 import Test.Hspec (Spec, describe, it, shouldBe)
 
-escapeNewline :: LazyByteString -> String
-escapeNewline = Text.unpack . Text.replace "\n" "\\n" . Text.decodeUtf8
+escapeNewline :: Text -> String
+escapeNewline = Text.unpack . Text.replace "\n" "\\n"
 
 spec :: Spec
 spec = do
@@ -32,7 +31,7 @@ spec = do
       it ("can pretty print: '" ++ escapeNewline src ++ "'") $
         format <$> parse src `shouldBe` Right expected
 
-parserTests :: [(LazyByteString, Jsonish)]
+parserTests :: [(Text, Jsonish)]
 parserTests =
   [ ("true", Value "true"),
     (" true", Value "true"),
@@ -57,6 +56,9 @@ parserTests =
     ("\"\" ", Value "\"\""),
     (" \" \" ", Value "\" \""),
     (" \"a b\" ", Value "\"a b\""),
+    (" \"\\\"a b\" ", Value "\"\\\"a b\""),
+    (" \"a\\\" b\" ", Value "\"a\\\" b\""),
+    (" \"a b\\\"\" ", Value "\"a b\\\"\""),
     (" \"a\nb\" ", Value "\"a\nb\""),
     (" \"\ta \nb false\" ", Value "\"\ta \nb false\""),
     ("[]", Array []),
@@ -122,7 +124,7 @@ parserTests =
     ("\"^[^@]+@[^@.]+\\.[^@]+$\"", Value "\"^[^@]+@[^@.]+\\.[^@]+$\"")
   ]
 
-formatterTests :: [(LazyByteString, LazyByteString)]
+formatterTests :: [(Text, Text)]
 formatterTests =
   [ ("null", "null"),
     (" true", "true"),

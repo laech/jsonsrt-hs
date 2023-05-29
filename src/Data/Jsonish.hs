@@ -8,66 +8,51 @@ module Data.Jsonish
 where
 
 import Control.Applicative ((<|>))
-import Data.Binary (Word8)
-import Data.ByteString (StrictByteString)
-import Data.ByteString.Lazy (LazyByteString)
-import Data.ByteString.Lazy qualified as LBS
 import Data.Char (isSpace)
 import Data.Foldable (fold)
+import Data.Text.Lazy (Text)
+import Data.Text.Lazy qualified as Text
 import Data.Void (Void)
-import Text.Megaparsec (ParseErrorBundle, Parsec, between, many, sepBy, takeWhile1P, try)
+import Text.Megaparsec (ParseErrorBundle, Parsec, between, many, sepBy, takeWhile1P)
 import Text.Megaparsec qualified as Parsec
-import Text.Megaparsec.Byte (char, space, string)
+import Text.Megaparsec.Char (char, space, string)
 
-type Parser = Parsec Void LazyByteString
+type Parser = Parsec Void Text
 
 data Jsonish
-  = Value StrictByteString
+  = Value Text
   | Array [Jsonish]
-  | Object [(StrictByteString, Jsonish)]
+  | Object [(Text, Jsonish)]
   deriving (Show, Eq)
 
-parse :: LazyByteString -> Either (ParseErrorBundle LazyByteString Void) Jsonish
+parse :: Text -> Either (ParseErrorBundle Text Void) Jsonish
 parse = Parsec.parse jsonish ""
+
+jsonish :: Parser Jsonish
+jsonish = space *> (object <|> array <|> value) <* space
+
+object :: Parser Jsonish
+object = Object <$> between (token '{') (token '}') (member `sepBy` token ',')
   where
-    jsonish =
-      space
-        *> ( Object <$> obj
-               <|> Array <$> arr
-               <|> Value <$> val
-           )
-        <* space
+    member = (,) <$> valueContent <*> (token ':' *> jsonish)
 
-    arr =
-      between
-        (token '[')
-        (token ']')
-        (jsonish `sepBy` token ',')
+array :: Parser Jsonish
+array = Array <$> between (token '[') (token ']') (jsonish `sepBy` token ',')
 
-    obj =
-      between
-        (token '{')
-        (token '}')
-        (member `sepBy` token ',')
+value :: Parser Jsonish
+value = Value <$> valueContent
 
-    member = (,) <$> val <*> (token ':' *> jsonish)
+valueContent :: Parser Text
+valueContent = str <|> notStr
+  where
+    notStr = takeWhile1P Nothing $ \x -> not (isSpace x || Text.elem x ",:{}[]")
+    str = do
+      inner <-
+        between (char '"') (char '"') . fmap fold . many $
+          takeWhile1P Nothing (not . (`Text.elem` "\\\""))
+            <|> string "\\\""
+            <|> takeWhile1P Nothing (not . (`Text.elem` "\""))
+      pure $ Text.concat ["\"", inner, "\""]
 
-    val = str <|> notStr
-
-    str =
-      (\s -> "\"" <> s <> "\"")
-        <$> between
-          (char . toEnum . fromEnum $ '"')
-          (char . toEnum . fromEnum $ '"')
-          ( fmap fold . many . fmap LBS.toStrict . try $
-              string "\\\"" <|> takeWhile1P_ (/= (toEnum . fromEnum $ '"'))
-          )
-
-    notStr =
-      fmap LBS.toStrict . takeWhile1P_ $ \x ->
-        not (isSpace . toEnum . fromEnum $ x) && not (LBS.elem x ",:{}[]")
-
-    takeWhile1P_ = takeWhile1P Nothing
-
-    token :: Char -> Parser Word8
-    token c = space *> (char . toEnum . fromEnum $ c) <* space
+token :: Char -> Parser Char
+token s = space *> char s <* space

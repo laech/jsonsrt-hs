@@ -13,10 +13,18 @@ library lib
   default-extensions:
     ImportQualifiedPost
     OverloadedStrings
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wmissing-export-lists
+    -Wmissing-home-modules
+    -Wpartial-fields
+    -Wredundant-constraints
   build-depends:
     base,
-    binary,
-    bytestring,
     megaparsec,
     text,
   default-language: Haskell2010
@@ -30,11 +38,19 @@ executable json-sort
   default-extensions:
     ImportQualifiedPost
     OverloadedStrings
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wmissing-export-lists
+    -Wmissing-home-modules
+    -Wpartial-fields
+    -Wredundant-constraints
   build-depends:
     lib,
     base,
-    binary,
-    bytestring,
     megaparsec,
     text,
   default-language: Haskell2010
@@ -50,11 +66,19 @@ test-suite json-sort-test
   default-extensions:
     ImportQualifiedPost
     OverloadedStrings
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wmissing-export-lists
+    -Wmissing-home-modules
+    -Wpartial-fields
+    -Wredundant-constraints
   build-depends:
     lib,
     base,
-    binary,
-    bytestring,
     hspec,
     megaparsec,
     string-interpolate,
