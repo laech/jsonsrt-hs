@@ -1,10 +1,11 @@
 module Main (main) where
 
+import Data.ByteString.Lazy qualified as ByteString
+import Data.ByteString.Lazy.Char8 qualified as ByteString
 import Data.Jsonish qualified as Jsonish
 import Data.Jsonish.Format qualified as Jsonish
-import Data.Text.Lazy.IO as Text
 
 main :: IO ()
 main =
-  Text.getContents
-    >>= either print (Text.putStrLn . Jsonish.format) . Jsonish.parse
+  ByteString.getContents
+    >>= either print (ByteString.putStrLn . Jsonish.format) . Jsonish.parse

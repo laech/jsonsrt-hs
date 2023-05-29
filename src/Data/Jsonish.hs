@@ -8,24 +8,26 @@ module Data.Jsonish
 where
 
 import Control.Applicative ((<|>))
-import Data.Char (isSpace)
+import Data.Binary (Word8)
+import Data.ByteString.Lazy (ByteString)
+import Data.ByteString.Lazy qualified as ByteString
+import Data.Char qualified as Char
 import Data.Foldable (fold)
-import Data.Text.Lazy (Text)
-import Data.Text.Lazy qualified as Text
 import Data.Void (Void)
 import Text.Megaparsec (ParseErrorBundle, Parsec, between, many, sepBy, takeWhile1P)
 import Text.Megaparsec qualified as Parsec
-import Text.Megaparsec.Char (char, space, string)
+import Text.Megaparsec.Byte (space)
+import Text.Megaparsec.Byte qualified as Parsec
 
-type Parser = Parsec Void Text
+type Parser = Parsec Void ByteString
 
 data Jsonish
-  = Value Text
+  = Value ByteString
   | Array [Jsonish]
-  | Object [(Text, Jsonish)]
+  | Object [(ByteString, Jsonish)]
   deriving (Show, Eq)
 
-parse :: Text -> Either (ParseErrorBundle Text Void) Jsonish
+parse :: ByteString -> Either (ParseErrorBundle ByteString Void) Jsonish
 parse = Parsec.parse jsonish ""
 
 jsonish :: Parser Jsonish
@@ -42,17 +44,23 @@ array = Array <$> between (token '[') (token ']') (jsonish `sepBy` token ',')
 value :: Parser Jsonish
 value = Value <$> valueContent
 
-valueContent :: Parser Text
-valueContent = str <|> notStr
+valueContent :: Parser ByteString
+valueContent = string <|> notString
   where
-    notStr = takeWhile1P Nothing $ \x -> not (isSpace x || Text.elem x ",:{}[]")
-    str = do
+    notString = takeWhile1P Nothing $ \x -> not (isSpace x || ByteString.elem x ",:{}[]")
+    string = do
       inner <-
         between (char '"') (char '"') . fmap fold . many $
-          takeWhile1P Nothing (not . (`Text.elem` "\\\""))
-            <|> string "\\\""
-            <|> takeWhile1P Nothing (not . (`Text.elem` "\""))
-      pure $ Text.concat ["\"", inner, "\""]
+          takeWhile1P Nothing (`ByteString.notElem` "\\\"")
+            <|> Parsec.string "\\\""
+            <|> takeWhile1P Nothing (`ByteString.notElem` "\"")
+      pure $ ByteString.concat ["\"", inner, "\""]
 
-token :: Char -> Parser Char
-token s = space *> char s <* space
+char :: Char -> Parser Word8
+char = Parsec.char . toEnum . fromEnum
+
+token :: Char -> Parser Word8
+token c = space *> (Parsec.char . toEnum . fromEnum $ c) <* space
+
+isSpace :: Word8 -> Bool
+isSpace = Char.isSpace . toEnum . fromEnum

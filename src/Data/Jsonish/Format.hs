@@ -1,10 +1,10 @@
 module Data.Jsonish.Format (format) where
 
+import Data.ByteString.Lazy (ByteString)
+import Data.ByteString.Lazy qualified as ByteString
 import Data.Jsonish (Jsonish (Array, Object, Value))
-import Data.Text.Lazy (Text)
-import Data.Text.Lazy qualified as Text
 
-format :: Jsonish -> Text
+format :: Jsonish -> ByteString
 format = fmtJsonish 0 False
   where
     fmtJsonish level indentFirstLine val =
@@ -23,5 +23,5 @@ format = fmtJsonish 0 False
         <> ": "
         <> fmtJsonish (level + 1) False val
 
-    foldLine = Text.intercalate ",\n"
-    indent level = Text.replicate level "  "
+    foldLine = ByteString.intercalate ",\n"
+    indent level = ByteString.take (level * 2) $ ByteString.cycle " "

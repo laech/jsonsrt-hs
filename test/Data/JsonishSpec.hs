@@ -5,33 +5,34 @@
 module Data.JsonishSpec (spec) where
 
 import Control.Monad (forM_)
+import Data.ByteString.Lazy (ByteString)
 import Data.Jsonish (Jsonish (..), parse)
 import Data.Jsonish.Format (format)
 import Data.String.Interpolate (i)
-import Data.Text.Lazy (Text)
 import Data.Text.Lazy qualified as Text
+import Data.Text.Lazy.Encoding qualified as Text
 import Test.Hspec (Spec, describe, it, shouldBe)
 
-escapeNewline :: Text -> String
-escapeNewline = Text.unpack . Text.replace "\n" "\\n"
+escapeNewline :: ByteString -> String
+escapeNewline = Text.unpack . Text.replace "\n" "\\n" . Text.decodeUtf8
 
 spec :: Spec
 spec = do
   describe "parse" $ do
     forM_ parserTests $ \(input, expected) -> do
-      it ("can parse: '" ++ escapeNewline input ++ "'") $
+      it ("can parse: `" ++ escapeNewline input ++ "`") $
         parse input `shouldBe` Right expected
 
     forM_ parserTests $ \(input, expected) -> do
-      it ("can parse from self formatted output: '" ++ escapeNewline input ++ "'") $
+      it ("can parse from self formatted output: `" ++ escapeNewline input ++ "`") $
         (parse input >>= parse . format) `shouldBe` Right expected
 
   describe "format" $ do
     forM_ formatterTests $ \(src, expected) ->
-      it ("can pretty print: '" ++ escapeNewline src ++ "'") $
+      it ("can pretty print: `" ++ escapeNewline src ++ "`") $
         format <$> parse src `shouldBe` Right expected
 
-parserTests :: [(Text, Jsonish)]
+parserTests :: [(ByteString, Jsonish)]
 parserTests =
   [ ("true", Value "true"),
     (" true", Value "true"),
@@ -121,10 +122,11 @@ parserTests =
             ]
         ]
     ),
+    ("\\u001b\\u007f", Value "\\u001b\\u007f"),
     ("\"^[^@]+@[^@.]+\\.[^@]+$\"", Value "\"^[^@]+@[^@.]+\\.[^@]+$\"")
   ]
 
-formatterTests :: [(Text, Text)]
+formatterTests :: [(ByteString, ByteString)]
 formatterTests =
   [ ("null", "null"),
     (" true", "true"),
