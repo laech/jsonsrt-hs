@@ -34,19 +34,19 @@ jobs:
           restore-keys: ${{ env.key }}-
 
       - run: cabal build all --only-dependencies
-      - run: cabal install hspec-discover
       - uses: actions/cache/save@v3
         if: ${{ steps.cache.outputs.cache-primary-key != steps.cache.outputs.cache-matched-key }}
         with:
           path: ${{ steps.setup.outputs.cabal-store }}
           key: ${{ steps.cache.outputs.cache-primary-key }}
 
-      - run: cabal install all --install-method copy
+      - run: cabal install all --install-method copy --installdir .
+      - run: cabal install hspec-discover
       - run: cabal test all
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           name: json-sort-${{ runner.os }}-${{ runner.arch }}
           path: |
-            ~/.cabal/bin/json-sort
-            ~/.cabal/bin/json-sort.exe
+            json-sort
+            json-sort.exe
