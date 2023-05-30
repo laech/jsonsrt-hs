@@ -44,8 +44,14 @@ jobs:
       - run: cabal build all
       - run: cabal test all
       - uses: actions/upload-artifact@v3
+        if: ${{ runner.os != 'Windows' }}
         with:
+          if-no-files-found: error
           name: json-sort-${{ runner.os }}-${{ runner.arch }}
-          path: |
-            dist-newstyle/build/*/ghc-*/json-sort-*/x/json-sort/build/json-sort/json-sort
-            dist-newstyle/build/*/ghc-*/json-sort-*/x/json-sort/build/json-sort/json-sort.exe
+          path: dist-newstyle/build/*/ghc-*/json-sort-*/x/json-sort/build/json-sort/json-sort
+      - uses: actions/upload-artifact@v3
+        if: ${{ runner.os == 'Windows' }}
+        with:
+          if-no-files-found: error
+          name: json-sort-${{ runner.os }}-${{ runner.arch }}
+          path: dist-newstyle/build/*/ghc-*/json-sort-*/x/json-sort/build/json-sort/json-sort.exe
