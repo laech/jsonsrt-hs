@@ -46,4 +46,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: json-sort-${{ runner.os }}-${{ runner.arch }}
-          path: dist-newstyle/build/*/ghc-*/json-sort-*/x/json-sort/build/json-sort/json-sort
+          path: |
+            dist-newstyle/build/*/ghc-*/json-sort-*/x/json-sort/build/json-sort/json-sort
+            dist-newstyle/build/*/ghc-*/json-sort-*/x/json-sort/build/json-sort/json-sort.exe
