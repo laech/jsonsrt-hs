@@ -11,7 +11,7 @@ import Data.Jsonish.Format (format)
 import Data.String.Interpolate (i)
 import Data.Text.Lazy qualified as Text
 import Data.Text.Lazy.Encoding qualified as Text
-import Test.Hspec (Spec, describe, it, shouldBe)
+import Test.Hspec (Spec, describe, expectationFailure, it, shouldBe)
 
 escapeNewline :: ByteString -> String
 escapeNewline = Text.unpack . Text.replace "\n" "\\n" . Text.decodeUtf8
@@ -21,16 +21,25 @@ spec = do
   describe "parse" $ do
     forM_ parserTests $ \(input, expected) -> do
       it ("can parse: `" ++ escapeNewline input ++ "`") $
-        parse input `shouldBe` Right expected
+        either
+          expectationFailure
+          (`shouldBe` expected)
+          (parse input)
 
     forM_ parserTests $ \(input, expected) -> do
       it ("can parse from self formatted output: `" ++ escapeNewline input ++ "`") $
-        (parse input >>= parse . format) `shouldBe` Right expected
+        either
+          expectationFailure
+          (`shouldBe` expected)
+          (parse input >>= parse . format)
 
   describe "format" $ do
     forM_ formatterTests $ \(src, expected) ->
       it ("can pretty print: `" ++ escapeNewline src ++ "`") $
-        format <$> parse src `shouldBe` Right expected
+        either
+          expectationFailure
+          (`shouldBe` expected)
+          (format <$> parse src)
 
 parserTests :: [(ByteString, Jsonish)]
 parserTests =

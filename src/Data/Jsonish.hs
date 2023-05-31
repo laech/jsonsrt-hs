@@ -8,13 +8,14 @@ module Data.Jsonish
 where
 
 import Control.Applicative ((<|>))
+import Control.Arrow (left)
 import Data.Binary (Word8)
 import Data.ByteString.Lazy (ByteString)
 import Data.ByteString.Lazy qualified as ByteString
 import Data.Char qualified as Char
 import Data.Foldable (fold)
 import Data.Void (Void)
-import Text.Megaparsec (ParseErrorBundle, Parsec, between, many, sepBy, takeWhile1P)
+import Text.Megaparsec (Parsec, between, errorBundlePretty, many, sepBy, takeWhile1P)
 import Text.Megaparsec qualified as Parsec
 import Text.Megaparsec.Byte (space, string)
 import Text.Megaparsec.Byte qualified as Parsec
@@ -27,8 +28,8 @@ data Jsonish
   | Object [(ByteString, Jsonish)]
   deriving (Show, Eq)
 
-parse :: ByteString -> Either (ParseErrorBundle ByteString Void) Jsonish
-parse = Parsec.parse jsonish ""
+parse :: ByteString -> Either String Jsonish
+parse = left errorBundlePretty . Parsec.parse jsonish ""
 
 jsonish :: Parser Jsonish
 jsonish = space *> (object <|> array <|> value) <* space
