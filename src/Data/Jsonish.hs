@@ -16,7 +16,7 @@ import Data.Foldable (fold)
 import Data.Void (Void)
 import Text.Megaparsec (ParseErrorBundle, Parsec, between, many, sepBy, takeWhile1P)
 import Text.Megaparsec qualified as Parsec
-import Text.Megaparsec.Byte (space)
+import Text.Megaparsec.Byte (space, string)
 import Text.Megaparsec.Byte qualified as Parsec
 
 type Parser = Parsec Void ByteString
@@ -34,25 +34,38 @@ jsonish :: Parser Jsonish
 jsonish = space *> (object <|> array <|> value) <* space
 
 object :: Parser Jsonish
-object = Object <$> between (token '{') (token '}') (member `sepBy` token ',')
+object =
+  Object
+    <$> between
+      (token '{')
+      (token '}')
+      (member `sepBy` token ',')
   where
-    member = (,) <$> valueContent <*> (token ':' *> jsonish)
+    member =
+      (,)
+        <$> stringish
+        <*> (token ':' *> jsonish)
 
 array :: Parser Jsonish
-array = Array <$> between (token '[') (token ']') (jsonish `sepBy` token ',')
+array =
+  Array
+    <$> between
+      (token '[')
+      (token ']')
+      (jsonish `sepBy` token ',')
 
 value :: Parser Jsonish
-value = Value <$> valueContent
+value = Value <$> stringish
 
-valueContent :: Parser ByteString
-valueContent = string <|> notString
+stringish :: Parser ByteString
+stringish = quoted <|> unquoted
   where
-    notString = takeWhile1P Nothing $ \x -> not (isSpace x || ByteString.elem x ",:{}[]")
-    string = do
+    unquoted = takeWhile1P Nothing $ \x -> not (isSpace x || ByteString.elem x ",:{}[]")
+    quoted = do
       inner <-
         between (char '"') (char '"') . fmap fold . many $
           takeWhile1P Nothing (`ByteString.notElem` "\\\"")
-            <|> Parsec.string "\\\""
+            <|> string "\\\""
             <|> takeWhile1P Nothing (`ByteString.notElem` "\"")
       pure $ ByteString.concat ["\"", inner, "\""]
 
@@ -60,7 +73,7 @@ char :: Char -> Parser Word8
 char = Parsec.char . toEnum . fromEnum
 
 token :: Char -> Parser Word8
-token c = space *> (Parsec.char . toEnum . fromEnum $ c) <* space
+token c = space *> char c <* space
 
 isSpace :: Word8 -> Bool
 isSpace = Char.isSpace . toEnum . fromEnum
