@@ -2,8 +2,7 @@ module Main (main) where
 
 import Data.ByteString.Lazy qualified as ByteString
 import Data.ByteString.Lazy.Char8 qualified as ByteString
-import Data.Jsonish (parse)
-import Data.Jsonish.Format (format)
+import Data.Jsonish (format, parse)
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 
