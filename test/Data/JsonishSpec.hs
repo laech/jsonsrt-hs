@@ -6,7 +6,7 @@ module Data.JsonishSpec (spec) where
 
 import Control.Monad (forM_)
 import Data.ByteString.Lazy (ByteString)
-import Data.Jsonish (Jsonish (..), format, parse)
+import Data.Jsonish (Jsonish (..), format, parse, sortByName)
 import Data.String.Interpolate (i)
 import Data.Text.Lazy qualified as Text
 import Data.Text.Lazy.Encoding qualified as Text
@@ -33,12 +33,17 @@ spec = do
           (parse input >>= parse . format)
 
   describe "format" $ do
-    forM_ formatterTests $ \(src, expected) ->
-      it ("can pretty print: `" ++ escapeNewline src ++ "`") $
+    forM_ formatterTests $ \(input, expected) ->
+      it ("can pretty print: `" ++ escapeNewline input ++ "`") $
         either
           expectationFailure
           (`shouldBe` expected)
-          (format <$> parse src)
+          (format <$> parse input)
+
+  describe "sortByName" $ do
+    forM_ sortByNameTests $ \(input, expected) ->
+      it ("can sort this by name: " ++ show input) $
+        sortByName input `shouldBe` expected
 
 parserTests :: [(ByteString, Jsonish)]
 parserTests =
@@ -169,5 +174,64 @@ formatterTests =
   },
   -1.000
 ]|]
+    )
+  ]
+
+sortByNameTests :: [(Jsonish, Jsonish)]
+sortByNameTests =
+  [ (Value "1", Value "1"),
+    (Object [], Object []),
+    (Object [("1", Value "a")], Object [("1", Value "a")]),
+    (Object [("1", Value "a"), ("2", Value "b")], Object [("1", Value "a"), ("2", Value "b")]),
+    (Object [("2", Value "b"), ("1", Value "a")], Object [("1", Value "a"), ("2", Value "b")]),
+    ( Object
+        [ ("2", Value "b"),
+          ("1", Value "a"),
+          ("3", Object [("1", Value "one"), ("0", Value "zero")])
+        ],
+      Object
+        [ ("1", Value "a"),
+          ("2", Value "b"),
+          ("3", Object [("0", Value "zero"), ("1", Value "one")])
+        ]
+    ),
+    ( Object
+        [ ("2", Value "b"),
+          ("1", Value "a"),
+          ("3", Array [Object [("1", Value "one"), ("0", Value "zero")]])
+        ],
+      Object
+        [ ("1", Value "a"),
+          ("2", Value "b"),
+          ("3", Array [Object [("0", Value "zero"), ("1", Value "one")]])
+        ]
+    ),
+    (Array [], Array []),
+    (Array [], Array []),
+    ( Array
+        [ Object
+            [ ("1", Value "one"),
+              ("0", Value "zero")
+            ]
+        ],
+      Array
+        [ Object
+            [ ("0", Value "zero"),
+              ("1", Value "one")
+            ]
+        ]
+    ),
+    ( Array
+        [ Object
+            [ ("1", Value "one"),
+              ("0", Array [Object [("y", Value "yy"), ("x", Value "xx")]])
+            ]
+        ],
+      Array
+        [ Object
+            [ ("0", Array [Object [("x", Value "xx"), ("y", Value "yy")]]),
+              ("1", Value "one")
+            ]
+        ]
     )
   ]

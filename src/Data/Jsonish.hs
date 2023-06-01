@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE StrictData #-}
 {-# LANGUAGE TypeFamilies #-}
 
@@ -5,16 +6,18 @@ module Data.Jsonish
   ( Jsonish (..),
     parse,
     format,
+    sortByName,
   )
 where
 
 import Control.Applicative ((<|>))
-import Control.Arrow (left)
+import Control.Arrow (left, second)
 import Data.Binary (Word8)
 import Data.ByteString.Lazy (ByteString)
 import Data.ByteString.Lazy qualified as ByteString
 import Data.Char qualified as Char
 import Data.Foldable (fold)
+import Data.List qualified as List
 import Data.Void (Void)
 import Text.Megaparsec (Parsec, between, errorBundlePretty, many, sepBy, takeWhile1P)
 import Text.Megaparsec qualified as Parsec
@@ -101,3 +104,9 @@ format = fmtJsonish 0 False
 
     foldLine = ByteString.intercalate ",\n"
     indent level = ByteString.take (level * 2) $ ByteString.cycle " "
+
+sortByName :: Jsonish -> Jsonish
+sortByName = \case
+  Value x -> Value x
+  Array xs -> Array . fmap sortByName $ xs
+  Object xs -> Object . List.sortOn fst . fmap (second sortByName) $ xs
