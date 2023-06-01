@@ -6,7 +6,7 @@ module Data.JsonishSpec (spec) where
 
 import Control.Monad (forM_)
 import Data.ByteString.Lazy (ByteString)
-import Data.Jsonish (Jsonish (..), format, parse, sortByName)
+import Data.Jsonish (Jsonish (..), format, parse, sortByName, sortByValue)
 import Data.String.Interpolate (i)
 import Data.Text.Lazy qualified as Text
 import Data.Text.Lazy.Encoding qualified as Text
@@ -44,6 +44,11 @@ spec = do
     forM_ sortByNameTests $ \(input, expected) ->
       it ("can sort this by name: " ++ show input) $
         sortByName input `shouldBe` expected
+
+  describe "sortByValue" $ do
+    forM_ sortByValueTests $ \(name, input, expected) ->
+      it ("can sort this by value: " ++ show input) $
+        sortByValue name input `shouldBe` expected
 
 parserTests :: [(ByteString, Jsonish)]
 parserTests =
@@ -207,7 +212,6 @@ sortByNameTests =
         ]
     ),
     (Array [], Array []),
-    (Array [], Array []),
     ( Array
         [ Object
             [ ("1", Value "one"),
@@ -232,6 +236,63 @@ sortByNameTests =
             [ ("0", Array [Object [("x", Value "xx"), ("y", Value "yy")]]),
               ("1", Value "one")
             ]
+        ]
+    )
+  ]
+
+sortByValueTests :: [(ByteString, Jsonish, Jsonish)]
+sortByValueTests =
+  [ ("", Value "1", Value "1"),
+    ("", Object [], Object []),
+    ("", Array [], Array []),
+    ( "name",
+      Array
+        [ Object [("\"name\"", Value "1")],
+          Object [("\"name\"", Value "2")]
+        ],
+      Array
+        [ Object [("\"name\"", Value "1")],
+          Object [("\"name\"", Value "2")]
+        ]
+    ),
+    ( "name",
+      Array
+        [ Object [("\"name\"", Value "2")],
+          Object [("\"name\"", Value "1")]
+        ],
+      Array
+        [ Object [("\"name\"", Value "1")],
+          Object [("\"name\"", Value "2")]
+        ]
+    ),
+    ( "name",
+      Object
+        [ ( "\"name\"",
+            Array
+              [ Object [("\"name\"", Value "2")],
+                Object [("\"name\"", Value "1")]
+              ]
+          )
+        ],
+      Object
+        [ ( "\"name\"",
+            Array
+              [ Object [("\"name\"", Value "1")],
+                Object [("\"name\"", Value "2")]
+              ]
+          )
+        ]
+    ),
+    ( "a",
+      Array
+        [ Object [("\"a\"", Value "1")],
+          Object [("\"a\"", Value "2")],
+          Object [("\"a\"", Value "0")]
+        ],
+      Array
+        [ Object [("\"a\"", Value "0")],
+          Object [("\"a\"", Value "1")],
+          Object [("\"a\"", Value "2")]
         ]
     )
   ]

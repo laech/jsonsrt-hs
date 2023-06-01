@@ -7,6 +7,7 @@ module Data.Jsonish
     parse,
     format,
     sortByName,
+    sortByValue,
   )
 where
 
@@ -107,6 +108,19 @@ format = fmtJsonish 0 False
 
 sortByName :: Jsonish -> Jsonish
 sortByName = \case
-  Value x -> Value x
-  Array xs -> Array . fmap sortByName $ xs
+  v@(Value _) -> v
   Object xs -> Object . List.sortOn fst . fmap (second sortByName) $ xs
+  Array xs -> Array . fmap sortByName $ xs
+
+sortByValue :: ByteString -> Jsonish -> Jsonish
+sortByValue name = \case
+  v@(Value _) -> v
+  Object xs -> Object . fmap (second $ sortByValue name) $ xs
+  Array xs -> Array . List.sortBy compareByValue . fmap (sortByValue name) $ xs
+  where
+    compareByValue a b = case (findValue a, findValue b) of
+      (Just (Value x), Just (Value y)) -> compare x y
+      _ -> EQ
+    findValue = \case
+      (Object xs) -> fmap snd . List.find ((("\"" <> name <> "\"") ==) . fst) $ xs
+      _ -> Nothing
