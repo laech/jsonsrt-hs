@@ -5,7 +5,6 @@ version: 0.1.0.0
 library lib
   exposed-modules:
     Data.Jsonish
-    Data.Jsonish.Format
   other-modules:
     Paths_json_sort
   hs-source-dirs:

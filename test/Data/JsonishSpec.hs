@@ -6,8 +6,7 @@ module Data.JsonishSpec (spec) where
 
 import Control.Monad (forM_)
 import Data.ByteString.Lazy (ByteString)
-import Data.Jsonish (Jsonish (..), parse)
-import Data.Jsonish.Format (format)
+import Data.Jsonish (Jsonish (..), format, parse)
 import Data.String.Interpolate (i)
 import Data.Text.Lazy qualified as Text
 import Data.Text.Lazy.Encoding qualified as Text

@@ -4,6 +4,7 @@
 module Data.Jsonish
   ( Jsonish (..),
     parse,
+    format,
   )
 where
 
@@ -78,3 +79,25 @@ token c = space *> char c <* space
 
 isSpace :: Word8 -> Bool
 isSpace = Char.isSpace . toEnum . fromEnum
+
+format :: Jsonish -> ByteString
+format = fmtJsonish 0 False
+  where
+    fmtJsonish level indentFirstLine val =
+      (if indentFirstLine then indent level else "") <> case val of
+        (Value x) -> x
+        (Array []) -> "[]"
+        (Array xs) -> "[\n" <> fmtArr level xs <> "\n" <> indent level <> "]"
+        (Object []) -> "{}"
+        (Object xs) -> "{\n" <> fmtObj level xs <> "\n" <> indent level <> "}"
+
+    fmtArr level = foldLine . fmap (fmtJsonish (level + 1) True)
+    fmtObj level = foldLine . fmap (fmtMember level)
+    fmtMember level (key, val) =
+      indent (level + 1)
+        <> key
+        <> ": "
+        <> fmtJsonish (level + 1) False val
+
+    foldLine = ByteString.intercalate ",\n"
+    indent level = ByteString.take (level * 2) $ ByteString.cycle " "
