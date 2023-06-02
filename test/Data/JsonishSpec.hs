@@ -5,15 +5,14 @@
 module Data.JsonishSpec (spec) where
 
 import Control.Monad (forM_)
-import Data.ByteString.Lazy (ByteString)
 import Data.Jsonish (Jsonish (..), format, parse, sortByName, sortByValue)
 import Data.String.Interpolate (i)
+import Data.Text.Lazy (Text)
 import Data.Text.Lazy qualified as Text
-import Data.Text.Lazy.Encoding qualified as Text
 import Test.Hspec (Spec, describe, expectationFailure, it, shouldBe)
 
-escapeNewline :: ByteString -> String
-escapeNewline = Text.unpack . Text.replace "\n" "\\n" . Text.decodeUtf8
+escapeNewline :: Text -> String
+escapeNewline = Text.unpack . Text.replace "\n" "\\n"
 
 spec :: Spec
 spec = do
@@ -50,7 +49,7 @@ spec = do
       it ("can sort this by value: " ++ show input) $
         sortByValue name input `shouldBe` expected
 
-parserTests :: [(ByteString, Jsonish)]
+parserTests :: [(Text, Jsonish)]
 parserTests =
   [ ("true", Value "true"),
     (" true", Value "true"),
@@ -144,7 +143,7 @@ parserTests =
     ("\"^[^@]+@[^@.]+\\.[^@]+$\"", Value "\"^[^@]+@[^@.]+\\.[^@]+$\"")
   ]
 
-formatterTests :: [(ByteString, ByteString)]
+formatterTests :: [(Text, Text)]
 formatterTests =
   [ ("null", "null"),
     (" true", "true"),
@@ -240,7 +239,7 @@ sortByNameTests =
     )
   ]
 
-sortByValueTests :: [(ByteString, Jsonish, Jsonish)]
+sortByValueTests :: [(Text, Jsonish, Jsonish)]
 sortByValueTests =
   [ ("", Value "1", Value "1"),
     ("", Object [], Object []),

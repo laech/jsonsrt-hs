@@ -3,9 +3,8 @@
 
 module Main (main) where
 
-import Data.ByteString.Lazy qualified as ByteString
-import Data.ByteString.Lazy.Char8 qualified as ByteString
 import Data.Jsonish qualified as Jsonish
+import Data.Text.Lazy.IO qualified as Text
 import Options (Options (..))
 import Options.Generic (getRecord)
 import System.Exit (exitFailure)
@@ -15,11 +14,11 @@ main :: IO ()
 main = do
   options :: Options <- getRecord ""
   print options
-  content <- ByteString.getContents
+  content <- Text.getContents
   case Jsonish.parse content of
     Left err -> hPutStrLn stderr err >> exitFailure
     Right val -> do
       print val
       let x1 = (if options.sortByName then Jsonish.sortByName else id) val
           x2 = maybe id Jsonish.sortByValue (options.sortByValue) x1
-       in ByteString.putStrLn (Jsonish.format x2)
+       in Text.putStrLn (Jsonish.format x2)

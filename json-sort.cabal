@@ -25,10 +25,9 @@ library lib
     -Wredundant-constraints
   build-depends:
     base,
-    binary,
-    bytestring,
     megaparsec,
     optparse-generic,
+    text,
   default-language: Haskell2010
 
 executable json-sort
@@ -53,7 +52,6 @@ executable json-sort
   build-depends:
     lib,
     base,
-    bytestring,
     optparse-generic,
     text,
   default-language: Haskell2010
@@ -82,7 +80,6 @@ test-suite json-sort-test
   build-depends:
     lib,
     base,
-    bytestring,
     hspec,
     string-interpolate,
     text,

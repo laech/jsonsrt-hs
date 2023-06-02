@@ -5,7 +5,7 @@ module Options
   )
 where
 
-import Data.ByteString.Lazy (ByteString)
+import Data.Text.Lazy (Text)
 import Options.Generic
   ( Generic,
     ParseRecord,
@@ -16,7 +16,7 @@ import Options.Generic
 
 data Options = Options
   { sortByName :: Bool,
-    sortByValue :: Maybe ByteString
+    sortByValue :: Maybe Text
   }
   deriving (Show, Eq, Generic)
 
