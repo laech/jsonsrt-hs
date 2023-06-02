@@ -11,18 +11,18 @@ module Data.Jsonish
   )
 where
 
-import Control.Applicative ((<|>))
+import Control.Applicative (liftA2, (<|>))
 import Control.Arrow (left, second)
 import Data.Binary (Word8)
 import Data.ByteString.Lazy (ByteString)
-import Data.ByteString.Lazy qualified as ByteString
+import Data.ByteString.Lazy qualified as BS
 import Data.Char qualified as Char
-import Data.Foldable (fold)
-import Data.List qualified as List
+import Data.Foldable (find, fold)
+import Data.List (sortBy, sortOn)
 import Data.Void (Void)
 import Text.Megaparsec (Parsec, between, errorBundlePretty, many, sepBy, takeWhile1P)
 import Text.Megaparsec qualified as Parsec
-import Text.Megaparsec.Byte (space, string)
+import Text.Megaparsec.Byte (space)
 import Text.Megaparsec.Byte qualified as Parsec
 
 type Parser = Parsec Void ByteString
@@ -49,7 +49,7 @@ object =
   where
     member =
       (,)
-        <$> stringish
+        <$> string
         <*> (token ':' *> jsonish)
 
 array :: Parser Jsonish
@@ -61,19 +61,21 @@ array =
       (jsonish `sepBy` token ',')
 
 value :: Parser Jsonish
-value = Value <$> stringish
-
-stringish :: Parser ByteString
-stringish = quoted <|> unquoted
+value = Value <$> (string <|> other)
   where
-    unquoted = takeWhile1P Nothing $ \x -> not (isSpace x || ByteString.elem x ",:{}[]")
-    quoted = do
-      inner <-
-        between (char '"') (char '"') . fmap fold . many $
-          takeWhile1P Nothing (`ByteString.notElem` "\\\"")
-            <|> string "\\\""
-            <|> takeWhile1P Nothing (`ByteString.notElem` "\"")
-      pure $ ByteString.concat ["\"", inner, "\""]
+    (<&&>) = liftA2 (&&)
+    other =
+      takeWhile1P Nothing $
+        (not . isSpace) <&&> (`BS.notElem` ",:{}[]")
+
+string :: Parser ByteString
+string = do
+  inner <-
+    between (char '"') (char '"') . fmap fold . many $
+      takeWhile1P Nothing (`BS.notElem` "\\\"")
+        <|> Parsec.string "\\\""
+        <|> takeWhile1P Nothing (`BS.notElem` "\"")
+  pure $ BS.concat ["\"", inner, "\""]
 
 char :: Char -> Parser Word8
 char = Parsec.char . toEnum . fromEnum
@@ -103,24 +105,24 @@ format = fmtJsonish 0 False
         <> ": "
         <> fmtJsonish (level + 1) False val
 
-    foldLine = ByteString.intercalate ",\n"
-    indent level = ByteString.take (level * 2) $ ByteString.cycle " "
+    foldLine = BS.intercalate ",\n"
+    indent level = BS.take (level * 2) $ BS.cycle " "
 
 sortByName :: Jsonish -> Jsonish
 sortByName = \case
   v@(Value _) -> v
-  Object xs -> Object . List.sortOn fst . fmap (second sortByName) $ xs
+  Object xs -> Object . sortOn fst . fmap (second sortByName) $ xs
   Array xs -> Array . fmap sortByName $ xs
 
 sortByValue :: ByteString -> Jsonish -> Jsonish
 sortByValue name = \case
   v@(Value _) -> v
   Object xs -> Object . fmap (second $ sortByValue name) $ xs
-  Array xs -> Array . List.sortBy compareByValue . fmap (sortByValue name) $ xs
+  Array xs -> Array . sortBy compareByValue . fmap (sortByValue name) $ xs
   where
     compareByValue a b = case (findValue a, findValue b) of
       (Just (Value x), Just (Value y)) -> compare x y
       _ -> EQ
     findValue = \case
-      (Object xs) -> fmap snd . List.find ((("\"" <> name <> "\"") ==) . fst) $ xs
+      (Object xs) -> fmap snd . find ((("\"" <> name <> "\"") ==) . fst) $ xs
       _ -> Nothing
