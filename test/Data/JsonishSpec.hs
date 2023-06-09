@@ -293,5 +293,31 @@ sortByValueTests =
           Object [("\"a\"", Value "1")],
           Object [("\"a\"", Value "2")]
         ]
+    ),
+    ( "a",
+      Array
+        [ Object [("\"a\"", Value "1")],
+          Object [("\"a\"", Value "0")],
+          Object
+            [ ( "\"b\"",
+                Array
+                  [ Object [("\"a\"", Value "2")],
+                    Object [("\"a\"", Value "1")]
+                  ]
+              )
+            ]
+        ],
+      Array
+        [ Object [("\"a\"", Value "0")],
+          Object [("\"a\"", Value "1")],
+          Object
+            [ ( "\"b\"",
+                Array
+                  [ Object [("\"a\"", Value "1")],
+                    Object [("\"a\"", Value "2")]
+                  ]
+              )
+            ]
+        ]
     )
   ]
