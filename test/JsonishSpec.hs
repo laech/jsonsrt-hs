@@ -2,13 +2,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 
-module Data.JsonishSpec (spec) where
+module JsonishSpec (spec) where
 
 import Control.Monad (forM_)
-import Data.Jsonish (Jsonish (..), format, parse, sortByName, sortByValue)
 import Data.String.Interpolate (i)
 import Data.Text.Lazy (Text)
 import Data.Text.Lazy qualified as Text
+import Jsonish (Jsonish (..), format, parse, sortByName, sortByValue)
 import Test.Hspec (Spec, describe, expectationFailure, it, shouldBe)
 
 escapeNewline :: Text -> String

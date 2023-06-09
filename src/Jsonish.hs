@@ -2,7 +2,7 @@
 {-# LANGUAGE StrictData #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Data.Jsonish
+module Jsonish
   ( Jsonish (..),
     parse,
     format,

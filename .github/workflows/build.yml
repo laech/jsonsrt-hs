@@ -46,7 +46,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
-          name: json-sort-${{ runner.os }}-${{ runner.arch }}
+          name: jsonsrt-${{ runner.os }}-${{ runner.arch }}
           path: |
-            json-sort
-            json-sort.exe
+            jsonsrt
+            jsonsrt.exe

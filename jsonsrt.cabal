@@ -1,13 +1,13 @@
 cabal-version: 2.4
-name: json-sort
+name: jsonsrt
 version: 0.1.0.0
 
 library lib
   exposed-modules:
-    Data.Jsonish
+    Jsonish
     Options
   other-modules:
-    Paths_json_sort
+    Paths_jsonsrt
   hs-source-dirs:
     src
   default-extensions:
@@ -30,10 +30,10 @@ library lib
     text,
   default-language: Haskell2010
 
-executable json-sort
+executable jsonsrt
   main-is: Main.hs
   other-modules:
-    Paths_json_sort
+    Paths_jsonsrt
   hs-source-dirs:
     app
   default-extensions:
@@ -56,12 +56,12 @@ executable json-sort
     text,
   default-language: Haskell2010
 
-test-suite json-sort-test
+test-suite jsonsrt-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-    Data.JsonishSpec
-    Paths_json_sort
+    JsonishSpec
+    Paths_jsonsrt
   hs-source-dirs:
     test
   default-extensions:
