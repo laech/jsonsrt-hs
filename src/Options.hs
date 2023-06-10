@@ -15,7 +15,8 @@ import Options.Generic
   )
 
 data Options = Options
-  { sortByName :: Bool,
+  { version :: Bool,
+    sortByName :: Bool,
     sortByValue :: Maybe Text
   }
   deriving (Show, Eq, Generic)
