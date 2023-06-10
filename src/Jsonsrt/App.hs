@@ -26,8 +26,7 @@ input :: Maybe FilePath -> IO Text
 input = maybe Text.getContents Text.readFile
 
 output :: Maybe FilePath -> Text -> IO ()
-output = maybe Text.putStrLn writeFileLn
+output = do
+  maybe Text.putStrLn writeFileLn
   where
-    writeFileLn path text = do
-      Text.writeFile path text
-      Text.writeFile path "\n"
+    writeFileLn path text = Text.writeFile path (text <> "\n")
