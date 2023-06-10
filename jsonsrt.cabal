@@ -4,9 +4,10 @@ version: 0.1
 
 library lib
   exposed-modules:
+    Jsonsrt.App
+    Jsonsrt.Args
     Jsonsrt.Format
     Jsonsrt.Node
-    Jsonsrt.Options
     Jsonsrt.Parse
     Jsonsrt.Sort
   other-modules:

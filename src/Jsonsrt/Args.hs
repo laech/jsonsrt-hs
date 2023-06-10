@@ -1,8 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Jsonsrt.Options
-  ( Options (..),
-    getOptions,
+module Jsonsrt.Args
+  ( Args,
+    parse,
+    version,
+    file,
+    sortByName,
+    sortByValue,
   )
 where
 
@@ -17,15 +21,16 @@ import Options.Generic
     parseRecordWithModifiers,
   )
 
-data Options = Options
-  { optVersion :: Bool,
-    optSortByName :: Bool,
-    optSortByValue :: Maybe Text
+data Args = Args
+  { version :: Bool,
+    file :: Maybe FilePath,
+    sortByName :: Bool,
+    sortByValue :: Maybe Text
   }
   deriving (Show, Eq, Generic)
 
-instance ParseRecord Options where
+instance ParseRecord Args where
   parseRecord = parseRecordWithModifiers lispCaseModifiers
 
-getOptions :: MonadIO m => m Options
-getOptions = getRecord ""
+parse :: MonadIO m => m Args
+parse = getRecord ""

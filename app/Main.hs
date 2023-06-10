@@ -1,26 +1,20 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Main (main) where
 
-import Data.Text.Lazy.IO qualified as Text
 import Data.Version (showVersion)
-import Jsonsrt.Format (format)
-import Jsonsrt.Options (Options (..), getOptions)
-import Jsonsrt.Parse (parse)
-import Jsonsrt.Sort (sortByName, sortByValue)
-import Paths_jsonsrt qualified as App
+import Jsonsrt.App (run)
+import Jsonsrt.Args qualified as Args
+import Paths_jsonsrt (version)
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 
 main :: IO ()
 main = do
-  options <- getOptions
-  if optVersion options
-    then putStrLn . showVersion $ App.version
-    else do
-      content <- Text.getContents
-      case parse content of
+  args <- Args.parse
+  if Args.version args
+    then putStrLn . showVersion $ version
+    else
+      run args >>= \case
         Left err -> hPutStrLn stderr err >> exitFailure
-        Right val -> do
-          print val
-          let x1 = (if optSortByName options then sortByName else id) val
-              x2 = maybe id sortByValue (optSortByValue options) x1
-           in Text.putStrLn (format x2)
+        Right _ -> pure ()
