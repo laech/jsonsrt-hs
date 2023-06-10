@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Options
+module Jsonsrt.Options
   ( Options (..),
   )
 where
@@ -15,9 +15,9 @@ import Options.Generic
   )
 
 data Options = Options
-  { version :: Bool,
-    sortByName :: Bool,
-    sortByValue :: Maybe Text
+  { optVersion :: Bool,
+    optSortByName :: Bool,
+    optSortByValue :: Maybe Text
   }
   deriving (Show, Eq, Generic)
 

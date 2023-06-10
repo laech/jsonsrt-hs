@@ -4,8 +4,11 @@ version: 0.1
 
 library lib
   exposed-modules:
-    Jsonish
-    Options
+    Jsonsrt.Format
+    Jsonsrt.Node
+    Jsonsrt.Options
+    Jsonsrt.Parse
+    Jsonsrt.Sort
   other-modules:
     Paths_jsonsrt
   hs-source-dirs:
@@ -60,7 +63,9 @@ test-suite jsonsrt-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-    JsonishSpec
+    Jsonsrt.FormatSpec
+    Jsonsrt.ParseSpec
+    Jsonsrt.SortSpec
     Paths_jsonsrt
   hs-source-dirs:
     test
