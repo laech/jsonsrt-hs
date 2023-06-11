@@ -6,12 +6,13 @@ import Data.Version (showVersion)
 import Jsonsrt.App (run)
 import Jsonsrt.Args qualified as Args
 import Paths_jsonsrt (version)
+import System.Environment (getArgs)
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 
 main :: IO ()
 main = do
-  args <- Args.parse
+  args <- getArgs >>= Args.parse
   if Args.version args
     then putStrLn . showVersion $ version
     else

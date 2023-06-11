@@ -1,36 +1,72 @@
-{-# LANGUAGE DeriveGeneric #-}
-
 module Jsonsrt.Args
-  ( Args,
+  ( Args (..),
     parse,
-    version,
-    file,
-    sortByName,
-    sortByValue,
   )
 where
 
-import Control.Monad.IO.Class (MonadIO)
 import Data.Text.Lazy (Text)
-import Options.Generic
-  ( Generic,
-    ParseRecord,
-    getRecord,
-    lispCaseModifiers,
-    parseRecord,
-    parseRecordWithModifiers,
+import Options.Applicative
+  ( Parser,
+    argument,
+    defaultPrefs,
+    execParserPure,
+    fullDesc,
+    handleParseResult,
+    help,
+    helper,
+    info,
+    long,
+    metavar,
+    optional,
+    progDesc,
+    str,
+    strOption,
+    switch,
+    (<**>),
   )
 
 data Args = Args
   { version :: Bool,
-    file :: Maybe FilePath,
     sortByName :: Bool,
-    sortByValue :: Maybe Text
+    sortByValue :: Maybe Text,
+    file :: Maybe FilePath
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq)
 
-instance ParseRecord Args where
-  parseRecord = parseRecordWithModifiers lispCaseModifiers
+args :: Parser Args
+args =
+  Args
+    <$> switch
+      ( long "version"
+          <> help "output version information and exit"
+      )
+    <*> switch
+      ( long "sort-by-name"
+          <> help "sort objects by key names"
+      )
+    <*> optional
+      ( strOption
+          ( long "sort-by-value"
+              <> metavar "KEY"
+              <> help "sort object arrays by comparing the values of KEY"
+          )
+      )
+    <*> optional
+      ( argument
+          str
+          ( metavar "FILE"
+              <> help "file to read/write, otherwise uses standard input/output"
+          )
+      )
 
-parse :: MonadIO m => m Args
-parse = getRecord ""
+parse :: [String] -> IO Args
+parse =
+  handleParseResult
+    . execParserPure
+      defaultPrefs
+      ( info
+          (args <**> helper)
+          ( fullDesc
+              <> progDesc "Sort JSON contents"
+          )
+      )
