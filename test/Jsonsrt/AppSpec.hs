@@ -4,8 +4,10 @@ module Jsonsrt.AppSpec (spec) where
 
 import Control.Exception (bracket)
 import Data.String.Interpolate (i)
+import Data.Version (showVersion)
 import Jsonsrt.App qualified as App
 import Jsonsrt.Args qualified as Args
+import Paths_jsonsrt (version)
 import System.Directory (removeFile)
 import System.IO (hClose, hPutStr, openTempFile)
 import System.Process (readProcess)
@@ -28,6 +30,10 @@ withTempFile content action = do
 spec :: Spec
 spec = do
   describe "app" $ do
+    it "can output version" $ do
+      output <- readProcess "cabal" ["run", "-v0", "jsonsrt", "--", "--version"] ""
+      output `shouldBe` (showVersion version ++ "\n")
+
     it "can use stdin/stdout" $ do
       output <- readProcess "cabal" ["run", "-v0", "jsonsrt"] "{ }"
       output `shouldBe` "{}\n"
