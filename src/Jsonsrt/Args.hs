@@ -38,24 +38,24 @@ args =
   Args
     <$> switch
       ( long "version"
-          <> help "output version information and exit"
+          <> help "Output version information and exit"
       )
     <*> switch
       ( long "sort-by-name"
-          <> help "sort objects by key names"
+          <> help "Sort objects by key names"
       )
     <*> optional
       ( strOption
           ( long "sort-by-value"
               <> metavar "KEY"
-              <> help "sort object arrays by comparing the values of KEY"
+              <> help "Sort object arrays by comparing the values of KEY"
           )
       )
     <*> optional
       ( argument
           str
           ( metavar "FILE"
-              <> help "file to read/write, otherwise uses standard input/output"
+              <> help "File to process, otherwise uses stdin/stdout"
           )
       )
 
