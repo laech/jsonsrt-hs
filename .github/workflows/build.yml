@@ -50,3 +50,32 @@ jobs:
           path: |
             jsonsrt
             jsonsrt.exe
+
+  prerelease-head:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: jsonsrt-Windows-x64
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: jsonsrt-Linux-x64
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: jsonsrt-macOS-x64
+
+      - uses: "marvinpinto/action-automatic-releases@v1.2.1"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "jsonsrt-head"
+          prerelease: true
+          title: "jsonsrt-head"
+          files: |
+            jsonsrt-Windows-x64
+            jsonsrt-Linux-x64
+            jsonsrt-macOS-x64
