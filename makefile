@@ -3,7 +3,8 @@
 all: test build
 
 build:
-	cabal install all --install-method copy --overwrite-policy=always --installdir .
+	cabal build
+	cp "$$(cabal list-bin jsonsrt)" .
 
 test:
-	cabal test all
+	cabal test
