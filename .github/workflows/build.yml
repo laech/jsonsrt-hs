@@ -20,7 +20,7 @@ jobs:
       - uses: haskell/actions/setup@v2
         id: setup
         with:
-          ghc-version: 9.2.7
+          ghc-version: 9.2
 
       - run: cabal configure --enable-tests --enable-benchmarks --disable-documentation
       - run: cabal build --dry-run
@@ -62,6 +62,10 @@ jobs:
       - uses: actions/download-artifact@v3
       - run: pwd
       - run: ls -lR
+      - run: |
+          mv -v jsonsrt-Linux-X64/jsonsrt jsonsrt-linux-x64
+          mv -v jsonsrt-macOS-X64/jsonsrt jsonsrt-macos-x64
+          mv -v jsonsrt-Windows-X64/jsonsrt.exe jsonsrt-windows-x64.exe
       - uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -69,4 +73,4 @@ jobs:
           prerelease: true
           title: "jsonsrt-head"
           files: |
-            jsonsrt*/*
+            jsonsrt-*
