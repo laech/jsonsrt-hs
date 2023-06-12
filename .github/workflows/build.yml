@@ -67,6 +67,4 @@ jobs:
           prerelease: true
           title: "jsonsrt-head"
           files: |
-            jsonsrt-Windows-x64
-            jsonsrt-Linux-x64
-            jsonsrt-macOS-x64
+            jsonsrt*
