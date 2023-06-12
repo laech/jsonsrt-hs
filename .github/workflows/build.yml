@@ -53,7 +53,8 @@ jobs:
 
   prerelease:
     needs: [build]
-    permissions: write-all
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
