@@ -65,12 +65,11 @@ jobs:
           mv -v jsonsrt-macOS-X64/jsonsrt jsonsrt-macos-x64
           mv -v jsonsrt-Windows-X64/jsonsrt.exe jsonsrt-windows-x64.exe
 
-      - uses: softprops/action-gh-release@v1
+      - uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
-          body: ""
-          tag_name: jsonsrt-head
-          target_commitish: "${{ env.GITHUB_SHA }}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: jsonsrt-head
           prerelease: true
-          fail_on_unmatched_files: true
+          title: jsonsrt-head
           files: |
             jsonsrt-*
