@@ -64,6 +64,7 @@ jobs:
           mv -v jsonsrt-Linux-X64/jsonsrt jsonsrt-linux-x64
           mv -v jsonsrt-macOS-X64/jsonsrt jsonsrt-macos-x64
           mv -v jsonsrt-Windows-X64/jsonsrt.exe jsonsrt-windows-x64.exe
+
       - uses: softprops/action-gh-release@v1
         with:
           name: jsonsrt-head
