@@ -60,8 +60,6 @@ jobs:
 
     steps:
       - uses: actions/download-artifact@v3
-      - run: pwd
-      - run: ls -lR
       - run: |
           mv -v jsonsrt-Linux-X64/jsonsrt jsonsrt-linux-x64
           mv -v jsonsrt-macOS-X64/jsonsrt jsonsrt-macos-x64
