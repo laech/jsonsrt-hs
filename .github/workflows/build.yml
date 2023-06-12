@@ -67,7 +67,9 @@ jobs:
 
       - uses: softprops/action-gh-release@v1
         with:
+          body: ""
           tag_name: jsonsrt-head
+          target_commitish: "${{ env.GITHUB_SHA }}"
           prerelease: true
           fail_on_unmatched_files: true
           files: |
