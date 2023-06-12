@@ -60,6 +60,7 @@ jobs:
 
     steps:
       - uses: actions/download-artifact@v3
+      - run: pwd
       - run: ls -lR
       - uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
@@ -68,4 +69,4 @@ jobs:
           prerelease: true
           title: "jsonsrt-head"
           files: |
-            jsonsrt*
+            jsonsrt*/*
