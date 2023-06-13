@@ -133,6 +133,16 @@ sortByValueTests =
     ),
     ( "a",
       Array
+        [ Object [("\"a\"", Value "\"cmd+h c\"")],
+          Object [("\"a\"", Value "\"cmd+h\"")]
+        ],
+      Array
+        [ Object [("\"a\"", Value "\"cmd+h\"")],
+          Object [("\"a\"", Value "\"cmd+h c\"")]
+        ]
+    ),
+    ( "a",
+      Array
         [ Object [("\"a\"", Value "1")],
           Object [("\"a\"", Value "0")],
           Object
