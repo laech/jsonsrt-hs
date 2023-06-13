@@ -1,15 +1,17 @@
 module Jsonsrt.Format (format) where
 
+import Data.Foldable (fold)
+import Data.List (intersperse)
 import Data.Text.Lazy (Text)
-import Data.Text.Lazy qualified as Text
+import Data.Text.Lazy.Builder (fromLazyText, fromString, toLazyText)
 import Jsonsrt.Node (Node (..))
 
 format :: Node -> Text
-format = fmtNode 0 False
+format = toLazyText . fmtNode 0 False
   where
-    fmtNode level indentFirstLine val =
-      (if indentFirstLine then indent level else "") <> case val of
-        (Value x) -> x
+    fmtNode level prefix val =
+      (if prefix then indent level else "") <> case val of
+        (Value x) -> fromLazyText x
         (Array []) -> "[]"
         (Array xs) -> "[\n" <> fmtArr level xs <> "\n" <> indent level <> "]"
         (Object []) -> "{}"
@@ -19,9 +21,9 @@ format = fmtNode 0 False
     fmtObj level = foldLine . fmap (fmtMember level)
     fmtMember level (key, val) =
       indent (level + 1)
-        <> key
+        <> fromLazyText key
         <> ": "
         <> fmtNode (level + 1) False val
 
-    foldLine = Text.intercalate ",\n"
-    indent level = Text.take (level * 2) $ Text.cycle " "
+    foldLine = fold . intersperse ",\n"
+    indent level = fromString $ replicate (level * 2) ' '
