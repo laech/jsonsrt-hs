@@ -12,7 +12,7 @@ import Jsonsrt.Node (Node (..))
 sortByName :: Node -> Node
 sortByName = \case
   v@(Value _) -> v
-  Object xs -> Object . sortOn fst . fmap (second sortByName) $ xs
+  Object xs -> Object . sortOn (unquote . fst) . fmap (second sortByName) $ xs
   Array xs -> Array . fmap sortByName $ xs
 
 sortByValue :: Text -> Node -> Node
@@ -27,9 +27,11 @@ sortByValue name = \case
     findValue = \case
       (Object xs) -> fmap snd . find ((("\"" <> name <> "\"") ==) . fst) $ xs
       _ -> Nothing
-    unquote str =
-      if Text.compareLength str 1 == GT
-        && "\"" `Text.isPrefixOf` str
-        && "\"" `Text.isSuffixOf` str
-        then Text.drop 1 . Text.dropEnd 1 $ str
-        else str
+
+unquote :: Text -> Text
+unquote str =
+  if Text.compareLength str 1 == GT
+    && "\"" `Text.isPrefixOf` str
+    && "\"" `Text.isSuffixOf` str
+    then Text.drop 1 . Text.dropEnd 1 $ str
+    else str

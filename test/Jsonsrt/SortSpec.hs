@@ -25,6 +25,9 @@ sortByNameTests =
     (Object [("1", Value "a")], Object [("1", Value "a")]),
     (Object [("1", Value "a"), ("2", Value "b")], Object [("1", Value "a"), ("2", Value "b")]),
     (Object [("2", Value "b"), ("1", Value "a")], Object [("1", Value "a"), ("2", Value "b")]),
+    ( Object [("\"a \"", Value "x"), ("\"a\"", Value "x")],
+      Object [("\"a\"", Value "x"), ("\"a \"", Value "x")]
+    ),
     ( Object
         [ ("2", Value "b"),
           ("1", Value "a"),

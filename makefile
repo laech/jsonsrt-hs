@@ -8,3 +8,6 @@ build:
 
 test:
 	cabal test
+
+install:
+	cabal install --overwrite-policy always --install-method copy
